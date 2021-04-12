@@ -1,10 +1,11 @@
 """
 """
 
-from allennlp.common import Registrable
+from allennlp.common import Registrable, FromParams
+from allennlp.common.params import Params
 
 
-def construct_registrable(base: Registrable, *args, **kwargs):
+def construct_registrable(base: Registrable, *args, **kwargs) -> Registrable:
     """
     Instantiating an object of the registered `kwargs[type]` subclass of `base`
     class by `*args`, `**kwargs`. In this way, you can pass extra parameters
@@ -15,3 +16,10 @@ def construct_registrable(base: Registrable, *args, **kwargs):
     cls = base.by_name(kwargs.pop("type"))
     obj = cls(*args, **kwargs)
     return obj
+
+
+def construct_from_params(cls: FromParams, **kwargs) -> FromParams:
+    """
+    Just merge additional kwargs. Such as `input_dim=X, **module`.
+    """
+    return cls.from_params(Params(kwargs))
