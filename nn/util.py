@@ -2,20 +2,22 @@
 Assorted utilities for working with neural networks.
 """
 
+from typing import Tuple
 import torch
 from allennlp.nn import util
 
 
-def batched_prune(items: torch.Tensor, features: torch.Tensor,
-                  mask: torch.BoolTensor, scorer: torch.nn.Module, topk: int):
+def batched_prune(items: torch.Tensor, scores: torch.Tensor,
+                  mask: torch.BoolTensor, features: torch.Tensor, topk: int
+                  ) -> Tuple[torch.Tensor, ...]:
     """
     Prune based on mention scores.
     """
 
     # Shape: (batch_size, num_items)
-    mention_scores = scorer(features).squeeze(-1)
+    scores = scores.squeeze(-1)
     # Shape: (batch_size, topk) for all 3 tensors
-    top_scores, top_mask, top_indices = util.masked_topk(mention_scores, mask, topk)
+    top_scores, top_mask, top_indices = util.masked_topk(scores, mask, topk)
 
     # Shape: (batch_size * topk)
     # torch.index_select only accepts 1D indices, but here we need to select
