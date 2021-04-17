@@ -14,7 +14,7 @@ from allennlp.modules.span_extractors import (
     SpanExtractor, EndpointSpanExtractor, SelfAttentiveSpanExtractor,
     BidirectionalEndpointSpanExtractor)
 
-from .conv_extractor import ConvSpanExtractor
+# from .conv_extractor import ConvSpanExtractor
 from .pooling_extractor import PoolingSpanExtractor
 
 
@@ -85,6 +85,8 @@ class MultiFeatrueSpanExtractor(SpanExtractor):
 
         if self._output_dim == 0:
             raise ConfigurationError("No extractor enabled, you must have one")
+        if self._span_width_embedding is not None:
+            self._output_dim += span_width_embedding_dim
 
     def get_input_dim(self) -> int:
         return self._input_dim
