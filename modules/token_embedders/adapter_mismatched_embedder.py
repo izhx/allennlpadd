@@ -23,8 +23,8 @@ class AdapterTransformerMismatchedEmbedder(TokenEmbedder):
     def __init__(
         self,
         model_name: str,
-        adapter_size: int = 64,
-        adapter_num: int = 12,
+        adapter_layers: int = 12,
+        adapter_kwargs: Optional[Dict[str, Any]] = None,
         external_param: Union[bool, List[bool]] = False,
         max_length: int = None,
         last_layer_only: bool = True,
@@ -36,8 +36,8 @@ class AdapterTransformerMismatchedEmbedder(TokenEmbedder):
         # The matched version v.s. mismatched
         self._matched_embedder = AdapterTransformerEmbedder(
             model_name,
-            adapter_size=adapter_size,
-            adapter_num=adapter_num,
+            adapter_layers=adapter_layers,
+            adapter_kwargs=adapter_kwargs,
             external_param=external_param,
             max_length=max_length,
             last_layer_only=last_layer_only,

@@ -2,9 +2,17 @@
 Assorted utilities for working with neural networks.
 """
 
-from typing import Tuple
+from typing import Tuple, Optional
 import torch
 from allennlp.nn import util
+
+
+def batched_linear(x: torch.Tensor, w: torch.Tensor, b: Optional[torch.Tensor]) -> torch.Tensor:
+    """ batched linear forward """
+    y = torch.einsum("bth,boh->bto", x, w)
+    if b is not None:
+        y = y + b.unsqueeze(1)
+    return y
 
 
 def batched_prune(items: torch.Tensor, scores: torch.Tensor,
