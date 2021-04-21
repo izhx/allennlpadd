@@ -44,6 +44,8 @@ class AdapterTransformerEmbedder(PretrainedTransformerEmbedder):
         )
         self.adapters = insert_adapters(
             adapter_layers, adapter_kwargs, external_param, self.transformer_model)
+        self.adapter_layers = adapter_layers
+        self.adapter_kwargs = adapter_kwargs
 
 
 def insert_adapters(

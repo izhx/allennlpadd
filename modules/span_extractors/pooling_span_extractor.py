@@ -13,9 +13,11 @@ from allennlp.common.checks import ConfigurationError
 from allennlp.modules.token_embedders.embedding import Embedding
 from allennlp.modules.span_extractors import SpanExtractor
 
+from .span_extractor import MySpanExtractor
+
 
 @SpanExtractor.register("pooling")
-class PoolingSpanExtractor(SpanExtractor):
+class PoolingSpanExtractor(MySpanExtractor):
 
     def __init__(
         self,
@@ -25,22 +27,13 @@ class PoolingSpanExtractor(SpanExtractor):
         span_width_embedding_dim: int = None,
         bucket_widths: bool = False,
     ) -> None:
-        super().__init__()
-        self._input_dim = input_dim
+        super().__init__(
+            input_dim,
+            num_width_embeddings=num_width_embeddings,
+            span_width_embedding_dim=span_width_embedding_dim,
+            bucket_widths=bucket_widths
+        )
         self._combination = combination
-        self._num_width_embeddings = num_width_embeddings
-        self._bucket_widths = bucket_widths
-
-        self._span_width_embedding: Optional[Embedding] = None
-        if num_width_embeddings is not None and span_width_embedding_dim is not None:
-            self._span_width_embedding = Embedding(
-                num_embeddings=num_width_embeddings, embedding_dim=span_width_embedding_dim
-            )
-        elif num_width_embeddings is not None or span_width_embedding_dim is not None:
-            raise ConfigurationError(
-                "To use a span width embedding representation, you must"
-                "specify both num_width_buckets and span_width_embedding_dim."
-            )
 
         if combination.lower() == 'mean':
             self.combine: Callable = util.masked_mean
@@ -55,7 +48,7 @@ class PoolingSpanExtractor(SpanExtractor):
     def get_output_dim(self) -> int:
         if self._span_width_embedding is None:
             return self._input_dim
-        return self._input_dim + self._span_width_embedding.get_output_dim()
+        return self._input_dim + self._span_width_embedding.embedding_dim
 
     @overrides
     def forward(
@@ -117,19 +110,15 @@ class PoolingSpanExtractor(SpanExtractor):
         # Shape: (batch_size, num_spans, embedding_dim)
         span_embeddings = self.combine(span_embeddings, span_mask.unsqueeze(-1), dim=2)
 
-        if self._span_width_embedding is not None:
-            # Embed the span widths and concatenate to the rest of the representations.
-            if self._bucket_widths:
-                span_widths = util.bucket_values(
-                    span_ends - span_starts, num_total_buckets=self._num_width_embeddings  # type: ignore
-                )
-            else:
-                span_widths = span_ends - span_starts
-
-            span_width_embeddings = self._span_width_embedding(span_widths)
-            span_embeddings = torch.cat([span_embeddings, span_width_embeddings], -1)
-
         if span_indices_mask is not None:
-            return span_embeddings * span_indices_mask.unsqueeze(-1)
+            span_embeddings *= span_indices_mask.unsqueeze(-1)
+
+        if self._span_width_embedding is not None:
+            # we combine the span_width_embeddings finally because we may get
+            # zero width embeddings for empty spans. We don't want it to be
+            # masked. It may be helpful in some tasks.
+            span_embeddings = self._combine_span_width_embeddings(
+                span_embeddings, span_indices, span_indices_mask
+            )
 
         return span_embeddings
