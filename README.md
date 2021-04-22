@@ -8,7 +8,7 @@ The modules and functions I have implemented are listed below.
 1. Span extractors registered in `SpanExtractor` :
    - `PoolingSpanExtractor` : Represent spans as the pooling (mean or max) of all tokens' embeddings , registered as `"pooling"`.
    - `MultiFeatureSpanExtractor` : A extractor to combine representations from any kinds of enabled `SpanExtractor` (i.e., `BidirectionalEndpointSpanExtractor`, `EndpointSpanExtractor`, `PoolingSpanExtractor`, `SelfAttentiveSpanExtractor`), registered as `"multi_feat"`.
-   - `My*SpanExtractor` : Refactored span extractors of allennlp (specifically, I unified the function interface and reduced the redundant code), registered as `"my_*"`.
+   - `My*SpanExtractor` : Refactored span extractors of allennlp (specifically, I unified the function interface, reduced the redundant code, and **fixed the wrong calculation of span width**), registered as `"my_*"`.
 
 
 2. Token embedders registered in `TokenEmbedder` : 
