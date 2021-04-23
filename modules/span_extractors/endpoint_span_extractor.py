@@ -80,8 +80,7 @@ class MyEndpointSpanExtractor(MySpanExtractor):
             return combined_dim + self._span_width_embedding.embedding_dim
         return combined_dim
 
-    @overrides
-    def forward(
+    def _embed_spans(
         self,
         sequence_tensor: torch.FloatTensor,
         span_indices: torch.LongTensor,
@@ -137,16 +136,5 @@ class MyEndpointSpanExtractor(MySpanExtractor):
         combined_tensors = util.combine_tensors(
             self._combination, [start_embeddings, end_embeddings]
         )
-
-        if span_indices_mask is not None:
-            combined_tensors *= span_indices_mask.unsqueeze(-1)
-
-        if self._span_width_embedding is not None:
-            # we combine the span_width_embeddings finally because we may get
-            # zero width embeddings for empty spans. We don't want it to be
-            # masked. It may be helpful in some tasks.
-            combined_tensors = self._combine_span_width_embeddings(
-                combined_tensors, span_indices, span_indices_mask
-            )
 
         return combined_tensors

@@ -50,8 +50,7 @@ class MySelfAttentiveSpanExtractor(MySpanExtractor):
     def get_output_dim(self) -> int:
         return self._input_dim
 
-    @overrides
-    def forward(
+    def _embed_spans(
         self,
         sequence_tensor: torch.FloatTensor,
         span_indices: torch.LongTensor,
@@ -72,25 +71,12 @@ class MySelfAttentiveSpanExtractor(MySpanExtractor):
         span_attention_logits = concat_output[:, :, :, -1]
 
         # Shape: (batch_size, num_spans, max_batch_span_width)
+        # mask the widths of spans with respect to the max span width in the batch.
         span_attention_weights = util.masked_softmax(span_attention_logits, span_mask)
 
         # Do a weighted sum of the embedded spans with
         # respect to the normalised attention distributions.
         # Shape: (batch_size, num_spans, embedding_dim)
         attended_text_embeddings = util.weighted_sum(span_embeddings, span_attention_weights)
-
-        if span_indices_mask is not None:
-            # Above we were masking the widths of spans with respect to the max
-            # span width in the batch. Here we are masking the spans which were
-            # originally passed in as padding.
-            attended_text_embeddings *= span_indices_mask.unsqueeze(-1)
-
-        if self._span_width_embedding is not None:
-            # we combine the span_width_embeddings finally because we may get
-            # zero width embeddings for empty spans. We don't want it to be
-            # masked. It may be helpful in some tasks.
-            attended_text_embeddings = self._combine_span_width_embeddings(
-                attended_text_embeddings, span_indices, span_indices_mask
-            )
 
         return attended_text_embeddings

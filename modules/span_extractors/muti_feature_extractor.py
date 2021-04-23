@@ -75,8 +75,7 @@ class MultiFeatrueSpanExtractor(MySpanExtractor):
     def get_output_dim(self) -> int:
         return self._output_dim
 
-    @overrides
-    def forward(
+    def _embed_spans(
         self,
         sequence_tensor: torch.FloatTensor,
         span_indices: torch.LongTensor,
@@ -84,18 +83,8 @@ class MultiFeatrueSpanExtractor(MySpanExtractor):
         span_indices_mask: torch.BoolTensor = None,
     ) -> None:
         # compute and combine all kinds of span embeddings
-        embeddings = [
+        combined_tensors = torch.cat([
             f(sequence_tensor, span_indices, sequence_mask, span_indices_mask)
             for f in self.extractor_forwards
-        ]
-        combined_tensors = torch.cat(embeddings, -1)
-
-        if self._span_width_embedding is not None:
-            # we combine the span_width_embeddings finally because we may get
-            # zero width embeddings for empty spans. We don't want it to be
-            # masked. It may be helpful in some tasks.
-            combined_tensors = self._combine_span_width_embeddings(
-                combined_tensors, span_indices, span_indices_mask
-            )
-
+        ], dim=-1)
         return combined_tensors

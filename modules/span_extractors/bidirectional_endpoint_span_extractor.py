@@ -112,15 +112,13 @@ class MyBidirectionalEndpointSpanExtractor(MySpanExtractor):
             )
         return forward_combined_dim + backward_combined_dim
 
-    @overrides
-    def forward(
+    def _embed_spans(
         self,
         sequence_tensor: torch.FloatTensor,
         span_indices: torch.LongTensor,
         sequence_mask: torch.BoolTensor = None,
         span_indices_mask: torch.BoolTensor = None,
     ) -> torch.FloatTensor:
-
         # Both of shape (batch_size, sequence_length, embedding_size / 2)
         forward_sequence, backward_sequence = sequence_tensor.split(
             int(self._input_dim / 2), dim=-1
@@ -221,16 +219,5 @@ class MyBidirectionalEndpointSpanExtractor(MySpanExtractor):
         )
         # Shape (batch_size, num_spans, forward_combination_dim + backward_combination_dim)
         span_embeddings = torch.cat([forward_spans, backward_spans], -1)
-
-        if span_indices_mask is not None:
-            span_embeddings *= span_indices_mask.unsqueeze(-1)
-
-        if self._span_width_embedding is not None:
-            # we combine the span_width_embeddings finally because we may get
-            # zero width embeddings for empty spans. We don't want it to be
-            # masked. It may be helpful in some tasks.
-            span_embeddings = self._combine_span_width_embeddings(
-                span_embeddings, span_indices, span_indices_mask
-            )
 
         return span_embeddings

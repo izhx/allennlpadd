@@ -10,7 +10,6 @@ import torch
 
 from allennlp.nn import util
 from allennlp.common.checks import ConfigurationError
-from allennlp.modules.token_embedders.embedding import Embedding
 from allennlp.modules.span_extractors import SpanExtractor
 
 from .span_extractor import MySpanExtractor
@@ -50,8 +49,7 @@ class PoolingSpanExtractor(MySpanExtractor):
             return self._input_dim
         return self._input_dim + self._span_width_embedding.embedding_dim
 
-    @overrides
-    def forward(
+    def _embed_spans(
         self,
         sequence_tensor: torch.FloatTensor,
         span_indices: torch.LongTensor,
@@ -109,16 +107,5 @@ class PoolingSpanExtractor(MySpanExtractor):
 
         # Shape: (batch_size, num_spans, embedding_dim)
         span_embeddings = self.combine(span_embeddings, span_mask.unsqueeze(-1), dim=2)
-
-        if span_indices_mask is not None:
-            span_embeddings *= span_indices_mask.unsqueeze(-1)
-
-        if self._span_width_embedding is not None:
-            # we combine the span_width_embeddings finally because we may get
-            # zero width embeddings for empty spans. We don't want it to be
-            # masked. It may be helpful in some tasks.
-            span_embeddings = self._combine_span_width_embeddings(
-                span_embeddings, span_indices, span_indices_mask
-            )
 
         return span_embeddings
