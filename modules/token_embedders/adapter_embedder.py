@@ -7,7 +7,7 @@ from typing import Optional, Dict, Any, Union, List
 
 import torch.nn as nn
 
-from transformers import BertModel
+from transformers import BertModel, ElectraModel
 
 from allennlp.common.checks import ConfigurationError
 from allennlp.modules.token_embedders import TokenEmbedder, PretrainedTransformerEmbedder
@@ -71,7 +71,7 @@ def insert_adapters(
     adapters_groups : `nn.ModuleList`, required.
         所插入的所有 adapter, 用于绑定到模型中。
     """
-    if not isinstance(transformer_model, BertModel):
+    if not isinstance(transformer_model, (BertModel, ElectraModel)):
         raise ConfigurationError("目前只支持bert结构")
 
     if isinstance(external_param, bool):
