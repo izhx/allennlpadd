@@ -9,4 +9,4 @@ except ModuleNotFoundError:
     )
     raise
 
-from .modules import AdapterTransformerMismatchedEmbedder, MultiFeatrueSpanExtractor
+from .modules import TransformerMismatchedEmbedder, MultiFeatrueSpanExtractor

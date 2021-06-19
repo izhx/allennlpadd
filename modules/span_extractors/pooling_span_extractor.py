@@ -3,7 +3,7 @@ Additional span embedding extractors from
 https://github.com/coder318/sodner/blob/master/sodner/models/span_extractors.py
 """
 
-from typing import Callable, Optional
+from typing import Callable
 from overrides import overrides
 
 import torch
@@ -11,12 +11,13 @@ import torch
 from allennlp.nn import util
 from allennlp.common.checks import ConfigurationError
 from allennlp.modules.span_extractors import SpanExtractor
-
-from .span_extractor import MySpanExtractor
+from allennlp.modules.span_extractors.span_extractor_with_span_width_embedding import (
+    SpanExtractorWithSpanWidthEmbedding
+)
 
 
 @SpanExtractor.register("pooling")
-class PoolingSpanExtractor(MySpanExtractor):
+class PoolingSpanExtractor(SpanExtractorWithSpanWidthEmbedding):
 
     def __init__(
         self,
@@ -49,6 +50,7 @@ class PoolingSpanExtractor(MySpanExtractor):
             return self._input_dim
         return self._input_dim + self._span_width_embedding.embedding_dim
 
+    @overrides
     def _embed_spans(
         self,
         sequence_tensor: torch.FloatTensor,

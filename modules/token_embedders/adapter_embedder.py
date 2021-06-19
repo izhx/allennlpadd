@@ -7,7 +7,7 @@ from typing import Optional, Dict, Any, Union, List
 
 import torch.nn as nn
 
-from transformers import BertModel, ElectraModel
+from transformers import BertModel, ElectraModel, RobertaModel
 
 from allennlp.common.checks import ConfigurationError
 from allennlp.modules.token_embedders import TokenEmbedder, PretrainedTransformerEmbedder
@@ -18,7 +18,7 @@ from ..adapter import Adapter, AdapterBertOutput
 @TokenEmbedder.register("adapter_transformer")
 class AdapterTransformerEmbedder(PretrainedTransformerEmbedder):
     """
-    目前只针对bert结构，插入adapter.
+    目前只针对 *BERT 结构，插入adapter.
     """
     def __init__(
         self,
@@ -28,7 +28,6 @@ class AdapterTransformerEmbedder(PretrainedTransformerEmbedder):
         adapter_kwargs: Optional[Dict[str, Any]] = None,
         external_param: Union[bool, List[bool]] = False,
         max_length: int = None,
-        last_layer_only: bool = True,
         gradient_checkpointing: Optional[bool] = None,
         tokenizer_kwargs: Optional[Dict[str, Any]] = None,
         transformer_kwargs: Optional[Dict[str, Any]] = None,
@@ -37,7 +36,7 @@ class AdapterTransformerEmbedder(PretrainedTransformerEmbedder):
             model_name,
             max_length=max_length,
             train_parameters=False,
-            last_layer_only=last_layer_only,
+            last_layer_only=True,
             gradient_checkpointing=gradient_checkpointing,
             tokenizer_kwargs=tokenizer_kwargs,
             transformer_kwargs=transformer_kwargs
@@ -53,7 +52,7 @@ def insert_adapters(
     external_param: Union[bool, List[bool]], transformer_model: BertModel
 ) -> nn.ModuleList:
     """
-    初始化 adapters, 插入到 BERT, 并返回 adapters. 目前只支持bert结构!
+    初始化 adapters, 插入到 BERT, 并返回 adapters. 目前只支持 *BERT 结构!
 
     # Parameters
 
@@ -71,8 +70,8 @@ def insert_adapters(
     adapters_groups : `nn.ModuleList`, required.
         所插入的所有 adapter, 用于绑定到模型中。
     """
-    if not isinstance(transformer_model, (BertModel, ElectraModel)):
-        raise ConfigurationError("目前只支持bert结构")
+    if not isinstance(transformer_model, (BertModel, ElectraModel, RobertaModel)):
+        raise ConfigurationError("目前只支持 *BERT 结构")
 
     if isinstance(external_param, bool):
         param_place = [external_param for _ in range(adapter_layers)]

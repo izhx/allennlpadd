@@ -6,4 +6,6 @@ that are used as components in AllenNLP `Model` s.
 
 from .span_extractors import MultiFeatrueSpanExtractor, PoolingSpanExtractor
 from .token_embedders import (
-    AdapterTransformerEmbedder, AdapterTransformerMismatchedEmbedder)
+    AdapterTransformerEmbedder, PgnAdapterTransformerEmbedder,
+    TransformerMismatchedEmbedder
+)

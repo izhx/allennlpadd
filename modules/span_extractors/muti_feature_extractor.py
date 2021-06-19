@@ -8,19 +8,18 @@ from overrides import overrides
 import torch
 
 from allennlp.common.checks import ConfigurationError
-from allennlp.modules.span_extractors import SpanExtractor
-#     SpanExtractor, EndpointSpanExtractor, SelfAttentiveSpanExtractor,
-#     BidirectionalEndpointSpanExtractor)
+from allennlp.modules.span_extractors import (
+    SpanExtractor, EndpointSpanExtractor, SelfAttentiveSpanExtractor,
+    BidirectionalEndpointSpanExtractor)
+from allennlp.modules.span_extractors.span_extractor_with_span_width_embedding import (
+    SpanExtractorWithSpanWidthEmbedding
+)
 
-from .span_extractor import MySpanExtractor
-from .bidirectional_endpoint_span_extractor import MyBidirectionalEndpointSpanExtractor
-from .endpoint_span_extractor import MyEndpointSpanExtractor
 from .pooling_span_extractor import PoolingSpanExtractor
-from .self_attentive_span_extractor import MySelfAttentiveSpanExtractor
 
 
 @SpanExtractor.register("multi_feat")
-class MultiFeatrueSpanExtractor(MySpanExtractor):
+class MultiFeatrueSpanExtractor(SpanExtractorWithSpanWidthEmbedding):
     def __init__(
         self,
         input_dim: int,
@@ -41,9 +40,9 @@ class MultiFeatrueSpanExtractor(MySpanExtractor):
         self._output_dim = 0
         self.extractor_forwards = list()
 
-        self._endpoint_extractor: Optional[MyEndpointSpanExtractor] = None
+        self._endpoint_extractor: Optional[EndpointSpanExtractor] = None
         if endpoint_combination:
-            self._endpoint_extractor = MyEndpointSpanExtractor(
+            self._endpoint_extractor = EndpointSpanExtractor(
                 input_dim, endpoint_combination)
             self._output_dim += self._endpoint_extractor.get_output_dim()
             self.extractor_forwards.append(self._endpoint_extractor.forward)
@@ -52,14 +51,14 @@ class MultiFeatrueSpanExtractor(MySpanExtractor):
             self._pooling_extractor = PoolingSpanExtractor(input_dim, pooling_combination)
             self._output_dim += self._pooling_extractor.get_output_dim()
             self.extractor_forwards.append(self._pooling_extractor.forward)
-        self._self_attentive_extractor: Optional[MySelfAttentiveSpanExtractor] = None
+        self._self_attentive_extractor: Optional[SelfAttentiveSpanExtractor] = None
         if self_attentive:
-            self._self_attentive_extractor = MySelfAttentiveSpanExtractor(input_dim)
+            self._self_attentive_extractor = SelfAttentiveSpanExtractor(input_dim)
             self._output_dim += self._self_attentive_extractor.get_output_dim()
             self.extractor_forwards.append(self._self_attentive_extractor.forward)
-        self._bidirectional_endpoint_extractor: Optional[MyBidirectionalEndpointSpanExtractor] = None
+        self._bidirectional_endpoint_extractor: Optional[BidirectionalEndpointSpanExtractor] = None
         if bidirectional_endpoint:
-            self._bidirectional_endpoint_extractor = MyBidirectionalEndpointSpanExtractor(
+            self._bidirectional_endpoint_extractor = BidirectionalEndpointSpanExtractor(
                 input_dim, **bidirectional_endpoint)
             self._output_dim += self._bidirectional_endpoint_extractor.get_output_dim()
             self.extractor_forwards.append(self._bidirectional_endpoint_extractor.forward)
@@ -75,6 +74,7 @@ class MultiFeatrueSpanExtractor(MySpanExtractor):
     def get_output_dim(self) -> int:
         return self._output_dim
 
+    @overrides
     def _embed_spans(
         self,
         sequence_tensor: torch.FloatTensor,

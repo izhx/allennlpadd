@@ -8,15 +8,15 @@ The modules and functions I have implemented are listed below.
 1. Span extractors registered in `SpanExtractor` :
    - `PoolingSpanExtractor` : Represent spans as the pooling (mean or max) of all tokens' embeddings , registered as `"pooling"`.
    - `MultiFeatureSpanExtractor` : A extractor to combine representations from any kinds of enabled `SpanExtractor` (i.e., `BidirectionalEndpointSpanExtractor`, `EndpointSpanExtractor`, `PoolingSpanExtractor`, `SelfAttentiveSpanExtractor`), registered as `"multi_feat"`.
-   - `My*SpanExtractor` : Refactored span extractors of allennlp (specifically, I unified the `forward` and reduced the redundant code), registered as `"my_*"`.
 
 
 2. Token embedders registered in `TokenEmbedder` : 
    - `AdapterTransformerEmbedder` : A parameter-effeicient way to use pre-trained BERT model on the down-stream tasks [1], which freeze BERT parameters and insert `Adapter`s into every layer, registered as `"adapter_transformer"`.
-   - `AdapterTransformerMismatchedEmbedder` : The mismatched version of `AdapterTransformerEmbedder`, registered as `"adapter_transformer_mismatched"`.
+   - `PgnAdapterTransformerEmbedder` : A special `AdapterTransformerEmbedder` with `domain_embedding`, could dynamically generate parameters for adapters inside [4], registered as `"pgn_adapter_transformer"`.
+   - `TransformerMismatchedEmbedder` : The general mismatched version of various `*TransformerEmbedder`, registered as `"transformer_mismatched"`.
 
 3. Seq2seq encoders registered in `Seq2SeqEncoder` : 
-   - `ParameterGenerationLstmSeq2SeqEncoder`: A LSTM that can dynamically generate  parameters for different domian to encode domain-aware representations [2, 3]. Coming soon.
+   - `ParameterGenerationLstmSeq2SeqEncoder`: A LSTM that could dynamically generate parameters for different domian to encode domain-aware representations [2, 3]. Coming soon.
 
 ### 1.2 Functions
 1. `common`
@@ -49,6 +49,7 @@ To use registered modules in config files:
 1. Houlsby, Neil, et al. "[Parameter-efficient transfer learning for NLP](http://proceedings.mlr.press/v97/houlsby19a.html)." International Conference on Machine Learning. PMLR, 2019.
 2. Platanios, Emmanouil Antonios, et al. "[Contextual Parameter Generation for Universal Neural Machine Translation](https://www.aclweb.org/anthology/D18-1039)." Proceedings of the 2018 Conference on Empirical Methods in Natural Language Processing. 2018.
 3. Jia, Chen, Xiaobo Liang, and Yue Zhang. "[Cross-domain NER using cross-domain language modeling](https://www.aclweb.org/anthology/P19-1236)." Proceedings of the 57th Annual Meeting of the Association for Computational Linguistics. 2019.
+4. Xin Zhang, Guangwei Xu, Yueheng Sun, Meishan Zhang, Pengjun Xie. "[Crowdsourcing Learning as Domain Adaptation: A Case Study on Named Entity Recognition](https://arxiv.org/abs/2105.14980)." Proceedings of the Joint Conference of the 59th Annual Meeting of the Association for Computational Linguistics and the 11th International Joint Conference on Natural Language Processing (ACL-IJCNLP). 2021.
 
 ## 4 Citation
 If you use AllenNLP in your research, please cite [AllenNLP: A Deep Semantic Natural Language Processing Platform](https://www.semanticscholar.org/paper/AllenNLP%3A-A-Deep-Semantic-Natural-Language-Platform-Gardner-Grus/a5502187140cdd98d76ae711973dbcdaf1fef46d).
