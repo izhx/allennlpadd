@@ -72,8 +72,6 @@ If you use AllenNLP in your research, please cite [AllenNLP: A Deep Semantic Nat
 ```
 
 If you use modules I developed (e.g., Adapter-BERT, PGN-LSTM), please cite the corresponding paper in the above "References" section.
-
-As for whether to cite my code, it doesn’t matter! (but at least mention it in the footnote 😂)
 ```
 @misc{allennlpadd,
   title={{allennlpadd}: additional classes for allennlp},

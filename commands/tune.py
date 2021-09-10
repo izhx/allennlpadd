@@ -78,7 +78,7 @@ def tune(args: argparse.Namespace) -> None:
         n_jobs=args.n_jobs,  # number of processes in parallel execution
     )
 
-    print("Number of finished trials: ", len(study.trials))
+    print("\n\nNumber of finished trials: ", len(study.trials))
     trial = study.best_trial
     print("Best trial:", trial.number)
     print("  Value: ", trial.value)
