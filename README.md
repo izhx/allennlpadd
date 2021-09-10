@@ -18,7 +18,14 @@ The modules and functions I have implemented are listed below.
 3. Seq2seq encoders registered in `Seq2SeqEncoder` : 
    - `ParameterGenerationLstmSeq2SeqEncoder`: A LSTM that could dynamically generate parameters for different domian to encode domain-aware representations [2, 3]. Coming soon.
 
-### 1.2 Functions
+
+### 1.2 Subcommands
+1. `tune`: sub-command for hyperparameter optimization using [Optuna](https://github.com/optuna/optuna), modified from [allennlp-optuna](https://github.com/himkt/allennlp-optuna).
+   - It combines the `hparams.json` and `optuna.json` in a single `jsonnet` config file.
+   - It will delete all trial archives except the best trial in the end of optimization.
+
+
+### 1.3 Functions
 1. `common`
    - `util`
       - `construct_from_params` : Construct a subclass of `FromParams` from the given `kwargs` argument dict.

@@ -1,6 +1,6 @@
 # Make sure that allennlp is installed
 try:
-    import allennlp
+    import allennlp  # noqa
 
 except ModuleNotFoundError:
     print(
@@ -9,4 +9,5 @@ except ModuleNotFoundError:
     )
     raise
 
-from .modules import TransformerMismatchedEmbedder, MultiFeatrueSpanExtractor
+from .commands import tune  # noqa
+from .modules import TransformerMismatchedEmbedder, MultiFeatrueSpanExtractor  # noqa
