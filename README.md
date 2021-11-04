@@ -74,7 +74,7 @@ If you use AllenNLP in your research, please cite [AllenNLP: A Deep Semantic Nat
 If you use modules I developed (e.g., Adapter-BERT, PGN-LSTM), please cite the corresponding paper in the above "References" section.
 ```
 @misc{allennlpadd,
-  title={{allennlpadd}: additional classes for allennlp},
+  title={allennlpadd: additional classes for allennlp},
   url={https://github.com/izhx/allennlpadd},
   note={Software available from https://github.com/izhx/allennlpadd},
   author={Xin Zhang},
